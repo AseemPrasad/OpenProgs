@@ -1,0 +1,20 @@
+# SecureAI Security Policy Configuration
+
+# Paths that the agent is allowed to access/mount (read-only)
+allowed_paths = [
+    "C:/Users/aseem/OneDrive/Dokumen/OpenProgs/secureai/docs",
+    "/tmp/input"
+]
+
+# Allow/Deny network access for the microVM
+network_access = false
+
+# Resource limits for the Firecracker VM
+max_memory_mb = 512
+
+# Allowed LLM models for inference
+allowed_models = [
+    "llama3",
+    "mistral",
+    "phi3"
+]

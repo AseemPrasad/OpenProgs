@@ -1,0 +1,31 @@
+[package]
+name = "secureai"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Core CLI and Async
+clap = { version = "4.4", features = ["derive"] }
+tokio = { version = "1.32", features = ["full"] }
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Serialization/Policy
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+serde_json = "1.0"
+
+# Identity & Crypto
+tss-esapi = "7.2" # TPM 2.0
+jsonwebtoken = "9.1"
+uuid = { version = "1.4", features = ["v4"] }
+
+# LLM Integration
+ollama-rs = "0.1"
+
+# Firecracker/Sandbox (Experimental/SDK)
+# Note: In a real production setup, we'd use the firecracker-sdk or 
+# call the binary via command line for simpler orchestration in MVP.
+# Using a mock-compatible interface for this prototype.
+reqwest = { version = "0.11", features = ["json"] } # To talk to Firecracker API
