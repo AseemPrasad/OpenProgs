@@ -61,6 +61,32 @@ async fn main() -> Result<()> {
             let engine = PolicyEngine::load("secureai.toml")
                 .context("Could not load secureai.toml. Run 'secureai init' or create the file.")?;
 
+            // 1a. Initialize Audit Ledger (if configured)
+            if let Some(audit_cfg) = engine.get_audit_config() {
+                if audit_cfg.enabled {
+                    let key_mgr = std::sync::Arc::new(
+                        crate::audit::Ed25519KeyManager::load_or_generate(&audit_cfg.key_path)
+                            .context("Failed to initialize audit keys")?
+                    );
+                    let _ledger = if audit_cfg.persistence_enabled {
+                        crate::audit::AuditLedger::new(key_mgr, Some(audit_cfg.ledger_path.clone()))?
+                    } else {
+                        crate::audit::AuditLedger::new(key_mgr, None)?
+                    };
+                    info!("✅ Audit ledger initialized");
+                }
+            }
+
+            // 1b. Initialize OpenTelemetry OTLP (if configured)
+            if let Some(telemetry_cfg) = engine.get_telemetry_config() {
+                if telemetry_cfg.enabled {
+                    let otel_config = telemetry_cfg.to_otlp_config();
+                    crate::telemetry::OTLPExporter::initialize(otel_config)
+                        .context("Failed to initialize OpenTelemetry")?;
+                    info!("✅ OpenTelemetry OTLP initialized");
+                }
+            }
+
             // 2. Validate Task
             if !engine.validate_task(&model, input.as_ref()) {
                 error!("❌ Security policy violation! Task rejected.");
@@ -87,6 +113,9 @@ async fn main() -> Result<()> {
             // 6. Teardown
             sandbox.teardown(&vm_id)?;
             println!("✅ Task complete. Session shredded.");
+
+            // 7. Shutdown OpenTelemetry (flush pending spans)
+            let _ = crate::telemetry::OTLPExporter::shutdown();
         }
         Commands::Logs => {
             println!("📜 Audit Logs (Last 5 sessions):");
