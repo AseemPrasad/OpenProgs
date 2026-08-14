@@ -5,6 +5,8 @@ mod api;
 mod guardrails;
 mod proxy;
 mod router;
+mod audit;
+mod telemetry;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
