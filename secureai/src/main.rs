@@ -94,6 +94,17 @@ async fn main() -> Result<()> {
                 }
             }
 
+            // 1c. Initialize Queue (if configured)
+            if let Some(queue_cfg) = engine.get_queue_config() {
+                if queue_cfg.enabled {
+                    let queue = crate::queue::QueueService::new(queue_cfg.clone())
+                        .await
+                        .context("Failed to initialize queue")?;
+                    crate::queue::initialize_queue(std::sync::Arc::new(queue))?;
+                    info!("✅ NATS worker queue initialized ({} workers)", queue_cfg.max_workers);
+                }
+            }
+
             // 2. Validate Task
             let is_valid = engine.validate_task(&model, input.as_ref());
             crate::audit::GlobalAuditHooks::log_policy_validation("system", &model, is_valid);
@@ -136,6 +147,9 @@ async fn main() -> Result<()> {
 
             // 7. Shutdown OpenTelemetry (flush pending spans)
             let _ = crate::telemetry::OTLPExporter::shutdown();
+
+            // 8. Shutdown Queue
+            let _ = crate::queue::shutdown_queue().await;
         }
         Commands::Logs => {
             println!("📜 Audit Logs (Last 5 sessions):");
