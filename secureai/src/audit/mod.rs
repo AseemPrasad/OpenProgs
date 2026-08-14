@@ -3,7 +3,7 @@ pub mod ledger;
 pub mod persist;
 
 pub use keys::{Ed25519KeyManager, KeyConfig};
-pub use ledger::AuditLedger;
+pub use ledger::{AuditLedger, AuditEntry};
 pub use persist::AuditPersist;
 
 use serde::Deserialize;
