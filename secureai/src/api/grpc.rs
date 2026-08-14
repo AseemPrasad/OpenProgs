@@ -9,6 +9,7 @@ use policy_service_server::PolicyService;
 use policy_service_server::PolicyServiceServer;
 
 use crate::policy::PolicyConfig;
+use crate::api::evals_integration::EvalsIntegration;
 
 pub struct PolicyServiceImpl {
     policy_store: Arc<RwLock<PolicyConfig>>,
@@ -46,6 +47,41 @@ impl PolicyService for PolicyServiceImpl {
             EvaluatePolicyResponse::Decision::Denied
         };
 
+        let mut metadata = std::collections::HashMap::new();
+
+        // Enqueue for evaluation if policy allows and evals is enabled
+        if decision == EvaluatePolicyResponse::Decision::Allowed {
+            let prompt = req.context.get("prompt").map(|s| s.as_str()).unwrap_or("");
+            let response_text = req.context.get("response").map(|s| s.as_str()).unwrap_or("");
+
+            if let Err(e) = EvalsIntegration::evaluate_request_async(
+                &req.tenant_id,
+                &req.tool_name,
+                prompt,
+                response_text,
+                &req.context,
+            )
+            .await
+            {
+                tracing::warn!("Failed to enqueue evaluation: {}", e);
+            }
+        }
+
+        // Check for drift alerts and include in metadata
+        let alerts = EvalsIntegration::get_drift_alerts();
+        if !alerts.is_empty() {
+            metadata.insert(
+                "drift_alerts_count".to_string(),
+                alerts.len().to_string(),
+            );
+            for (idx, alert) in alerts.iter().enumerate() {
+                metadata.insert(
+                    format!("drift_alert_{}", idx),
+                    alert.description(),
+                );
+            }
+        }
+
         let response = EvaluatePolicyResponse {
             decision: decision as i32,
             rule_id: format!("rule-{}-{}", req.tenant_id, req.tool_name),
@@ -60,7 +96,7 @@ impl PolicyService for PolicyServiceImpl {
                     format!("Tool '{}' requires human approval", req.tool_name)
                 }
             },
-            metadata: std::collections::HashMap::new(),
+            metadata,
         };
 
         Ok(Response::new(response))
