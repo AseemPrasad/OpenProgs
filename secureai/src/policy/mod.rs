@@ -31,6 +31,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub telemetry: Option<crate::telemetry::TelemetryConfig>,
+
+    #[serde(default)]
+    pub queue: Option<crate::queue::QueueConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -254,5 +257,9 @@ impl PolicyEngine {
 
     pub fn get_telemetry_config(&self) -> Option<&crate::telemetry::TelemetryConfig> {
         self.config.telemetry.as_ref()
+    }
+
+    pub fn get_queue_config(&self) -> Option<&crate::queue::QueueConfig> {
+        self.config.queue.as_ref()
     }
 }
