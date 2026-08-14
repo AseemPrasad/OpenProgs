@@ -56,3 +56,12 @@ ort = "2.0"
 ndarray = "0.15"
 ndarray-linalg = { version = "0.16", features = ["openblas-static"] }
 lazy_static = "1.4"
+
+# Async Stream Proxy
+axum = "0.7"
+hyper = { version = "1.0", features = ["full"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+tiktoken-rs = "0.5"
+bytes = "1.5"
+parking_lot = "0.12"
+futures-util = "0.3"
