@@ -40,6 +40,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub evals: Option<crate::evals::EvalsConfig>,
+
+    #[serde(default)]
+    pub auth: Option<crate::auth::AuthConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -275,5 +278,9 @@ impl PolicyEngine {
 
     pub fn get_evals_config(&self) -> Option<&crate::evals::EvalsConfig> {
         self.config.evals.as_ref()
+    }
+
+    pub fn get_auth_config(&self) -> Option<&crate::auth::AuthConfig> {
+        self.config.auth.as_ref()
     }
 }
