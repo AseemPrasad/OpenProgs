@@ -8,6 +8,49 @@ pub struct PolicyConfig {
     pub network_access: bool,
     pub max_memory_mb: u32,
     pub allowed_models: Vec<String>,
+
+    #[serde(default)]
+    pub isolation: Option<IsolationPolicy>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct IsolationPolicy {
+    #[serde(default = "default_enable_landlock")]
+    pub enable_landlock: bool,
+
+    #[serde(default = "default_enable_seccomp")]
+    pub enable_seccomp: bool,
+
+    #[serde(default = "default_enable_cgroups")]
+    pub enable_cgroups: bool,
+
+    #[serde(default)]
+    pub landlock_paths: Vec<PathBuf>,
+
+    #[serde(default)]
+    pub workspace_path: Option<String>,
+
+    #[serde(default = "default_memory_limit")]
+    pub memory_limit_mb: u32,
+
+    #[serde(default = "default_cpu_quota")]
+    pub cpu_quota: f64,
+
+    #[serde(default = "default_process_limit")]
+    pub max_processes: u32,
+}
+
+fn default_enable_landlock() -> bool { true }
+fn default_enable_seccomp() -> bool { true }
+fn default_enable_cgroups() -> bool { true }
+fn default_memory_limit() -> u32 { 512 }
+fn default_cpu_quota() -> f64 { 1.0 }
+fn default_process_limit() -> u32 { 100 }
+
+impl IsolationPolicy {
+    pub fn enabled(&self) -> bool {
+        self.enable_landlock || self.enable_seccomp || self.enable_cgroups
+    }
 }
 
 pub struct PolicyEngine {
@@ -44,5 +87,9 @@ impl PolicyEngine {
 
     pub fn get_vm_spec(&self) -> &PolicyConfig {
         &self.config
+    }
+
+    pub fn get_isolation_policy(&self) -> Option<&IsolationPolicy> {
+        self.config.isolation.as_ref()
     }
 }
