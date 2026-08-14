@@ -80,14 +80,21 @@ impl PolicyEngine {
     }
 
     pub fn validate_task(&self, model: &str, input_path: Option<&PathBuf>) -> bool {
+        // Use remote store config if available
+        let policy = if let Some(store) = &self.store {
+            store.get_policy()
+        } else {
+            std::sync::Arc::new(self.config.clone())
+        };
+
         // Check if model is allowed
-        if !self.config.allowed_models.contains(&model.to_string()) {
+        if !policy.allowed_models.contains(&model.to_string()) {
             return false;
         }
 
         // Check if input path is within allowed paths
         if let Some(path) = input_path {
-            let is_allowed = self.config.allowed_paths.iter().any(|allowed| {
+            let is_allowed = policy.allowed_paths.iter().any(|allowed| {
                 path.starts_with(allowed)
             });
             if !is_allowed {
@@ -102,11 +109,25 @@ impl PolicyEngine {
         &self.config
     }
 
+    pub fn get_current_config(&self) -> std::sync::Arc<PolicyConfig> {
+        if let Some(store) = &self.store {
+            store.get_policy()
+        } else {
+            std::sync::Arc::new(self.config.clone())
+        }
+    }
+
     pub fn get_isolation_policy(&self) -> Option<&IsolationPolicy> {
         self.config.isolation.as_ref()
     }
 
     pub fn get_store(&self) -> Option<&PolicyStore> {
         self.store.as_ref()
+    }
+
+    pub fn subscribe_to_updates(
+        &self,
+    ) -> Option<tokio::sync::broadcast::Receiver<PolicyStoreUpdate>> {
+        self.store.as_ref().map(|store| store.subscribe_updates())
     }
 }
