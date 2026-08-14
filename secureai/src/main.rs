@@ -117,6 +117,18 @@ async fn main() -> Result<()> {
                 }
             }
 
+            // 1e. Initialize Real-Time Evals (if configured)
+            if let Some(evals_cfg) = engine.get_evals_config() {
+                if evals_cfg.enabled {
+                    let eval_engine = crate::evals::EvaluationEngine::new(evals_cfg.clone())
+                        .await
+                        .context("Failed to initialize evals engine")?;
+                    crate::evals::initialize_evals(std::sync::Arc::new(eval_engine))?;
+                    info!("✅ Real-time evaluation engine initialized (sampling: {}%)",
+                          (evals_cfg.sampling_rate * 100.0) as u32);
+                }
+            }
+
             // 2. Validate Task
             let is_valid = engine.validate_task(&model, input.as_ref());
             crate::audit::GlobalAuditHooks::log_policy_validation("system", &model, is_valid);
@@ -174,6 +186,9 @@ async fn main() -> Result<()> {
 
             // 9. Shutdown Cache
             let _ = crate::cache::shutdown_cache().await;
+
+            // 10. Shutdown Evals
+            let _ = crate::evals::shutdown_evals().await;
         }
         Commands::Logs => {
             println!("📜 Audit Logs (Last 5 sessions):");
