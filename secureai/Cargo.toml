@@ -95,3 +95,6 @@ thiserror = "1.0"
 # Semantic Caching
 moka = { version = "0.12", features = ["future"] }
 distances = "0.2"
+
+# OAuth2/OIDC Authentication & Authorization
+lru = "0.12"
