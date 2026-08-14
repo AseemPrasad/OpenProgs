@@ -9,6 +9,7 @@ mod audit;
 mod telemetry;
 mod queue;
 mod cache;
+mod evals;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
