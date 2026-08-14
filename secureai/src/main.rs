@@ -106,6 +106,16 @@ async fn main() -> Result<()> {
                 }
             }
 
+            // 1d. Initialize Cache (if configured)
+            if let Some(cache_cfg) = engine.get_cache_config() {
+                if cache_cfg.enabled {
+                    let cache_manager = crate::cache::CacheManager::new(cache_cfg.clone());
+                    crate::cache::initialize_cache(std::sync::Arc::new(cache_manager))?;
+                    info!("✅ Semantic cache initialized (Tier1: {}, Tier2: {})",
+                          cache_cfg.tier1_enabled, cache_cfg.tier2_enabled);
+                }
+            }
+
             // 2. Validate Task
             let is_valid = engine.validate_task(&model, input.as_ref());
             crate::audit::GlobalAuditHooks::log_policy_validation("system", &model, is_valid);
@@ -160,6 +170,9 @@ async fn main() -> Result<()> {
 
             // 8. Shutdown Queue
             let _ = crate::queue::shutdown_queue().await;
+
+            // 9. Shutdown Cache
+            let _ = crate::cache::shutdown_cache().await;
         }
         Commands::Logs => {
             println!("📜 Audit Logs (Last 5 sessions):");
