@@ -19,6 +19,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub guardrails: Option<GuardrailConfig>,
+
+    #[serde(default)]
+    pub proxy: Option<crate::proxy::ProxyConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
