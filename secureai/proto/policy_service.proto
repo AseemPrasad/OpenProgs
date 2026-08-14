@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package secureai.policy;
+
+import "google/protobuf/empty.proto";
+
+service PolicyService {
+  rpc EvaluatePolicy (EvaluatePolicyRequest) returns (EvaluatePolicyResponse);
+  rpc WatchPolicyUpdates (google.protobuf.Empty) returns (stream PolicyUpdate);
+}
+
+message EvaluatePolicyRequest {
+  string tenant_id = 1;
+  string caller_identity = 2;
+  string tool_name = 3;
+  string target_path = 4;
+  map<string, string> context = 5;
+}
+
+message EvaluatePolicyResponse {
+  enum Decision {
+    ALLOWED = 0;
+    DENIED = 1;
+    REQUIRES_APPROVAL = 2;
+  }
+
+  Decision decision = 1;
+  string rule_id = 2;
+  string reason = 3;
+  map<string, string> metadata = 4;
+}
+
+message PolicyUpdate {
+  string tenant_id = 1;
+  bytes policy_config = 2;
+  int64 version = 3;
+  int64 timestamp = 4;
+}
