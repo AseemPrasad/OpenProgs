@@ -25,6 +25,12 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub router: Option<crate::router::RouterConfig>,
+
+    #[serde(default)]
+    pub audit: Option<crate::audit::AuditConfig>,
+
+    #[serde(default)]
+    pub telemetry: Option<crate::telemetry::TelemetryConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -240,5 +246,13 @@ impl PolicyEngine {
             }
         }
         Ok(())
+    }
+
+    pub fn get_audit_config(&self) -> Option<&crate::audit::AuditConfig> {
+        self.config.audit.as_ref()
+    }
+
+    pub fn get_telemetry_config(&self) -> Option<&crate::telemetry::TelemetryConfig> {
+        self.config.telemetry.as_ref()
     }
 }
