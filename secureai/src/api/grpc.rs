@@ -13,6 +13,7 @@ use crate::policy::PolicyConfig;
 pub struct PolicyServiceImpl {
     policy_store: Arc<RwLock<PolicyConfig>>,
     update_sender: tokio::sync::broadcast::Sender<PolicyUpdate>,
+    guardrail: Option<Arc<crate::guardrails::SemanticGuardrail>>,
 }
 
 #[tonic::async_trait]
@@ -25,6 +26,18 @@ impl PolicyService for PolicyServiceImpl {
 
         // Read policy without blocking writes
         let policy = self.policy_store.read().await;
+
+        // Run semantic guardrail check if available (via guardrail member)
+        if let Some(guardrail) = &self.guardrail {
+            if let Err(e) = guardrail.check_prompt(&req.tool_name).await {
+                return Ok(Response::new(EvaluatePolicyResponse {
+                    decision: EvaluatePolicyResponse::Decision::Denied as i32,
+                    rule_id: "semantic-guardrail".to_string(),
+                    reason: format!("Semantic guardrail triggered: {}", e),
+                    metadata: std::collections::HashMap::new(),
+                }));
+            }
+        }
 
         // Evaluate policy for the request
         let decision = if policy.allowed_models.contains(&req.tool_name) {
@@ -73,6 +86,19 @@ impl PolicyServiceImpl {
         Self {
             policy_store,
             update_sender,
+            guardrail: None,
+        }
+    }
+
+    pub fn with_guardrail(
+        policy_store: Arc<RwLock<PolicyConfig>>,
+        update_sender: tokio::sync::broadcast::Sender<PolicyUpdate>,
+        guardrail: Arc<crate::guardrails::SemanticGuardrail>,
+    ) -> Self {
+        Self {
+            policy_store,
+            update_sender,
+            guardrail: Some(guardrail),
         }
     }
 
