@@ -2,6 +2,7 @@ mod policy;
 mod identity;
 mod sandbox;
 mod api;
+mod guardrails;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
