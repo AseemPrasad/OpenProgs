@@ -7,7 +7,7 @@ pub mod integration;
 pub use entry::{CacheEntry, CacheMetadata, CacheTier, CacheHit};
 pub use tier1::ExactMatchCache;
 pub use tier2::SemanticCache;
-pub use manager::{CacheManager, CacheStats, initialize_cache, shutdown_cache, get_cache};
+pub use manager::{CacheManager, CacheStats, initialize_cache, shutdown_cache, get_cache, is_cache_enabled};
 
 use serde::Deserialize;
 
