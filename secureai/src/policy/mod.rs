@@ -34,6 +34,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub queue: Option<crate::queue::QueueConfig>,
+
+    #[serde(default)]
+    pub cache: Option<crate::cache::CacheConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -261,5 +264,9 @@ impl PolicyEngine {
 
     pub fn get_queue_config(&self) -> Option<&crate::queue::QueueConfig> {
         self.config.queue.as_ref()
+    }
+
+    pub fn get_cache_config(&self) -> Option<&crate::cache::CacheConfig> {
+        self.config.cache.as_ref()
     }
 }
