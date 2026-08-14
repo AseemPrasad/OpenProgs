@@ -2,19 +2,37 @@ use anyhow::{Result, Context as AnyhowContext};
 use std::process::Command;
 use std::path::PathBuf;
 
+use crate::policy::IsolationPolicy;
+
 pub mod landlock;
 pub mod cgroups;
 pub mod seccomp;
 pub mod executor;
 
+pub use executor::SandboxExecutor;
+
 pub struct SandboxManager {
     firecracker_path: String,
+    enable_kernel_isolation: bool,
 }
 
 impl SandboxManager {
     pub fn new() -> Self {
+        let enable_kernel_isolation = std::env::var("ENABLE_KERNEL_ISOLATION")
+            .ok()
+            .map(|v| v.to_lowercase() == "true")
+            .unwrap_or(false);
+
         Self {
             firecracker_path: "firecracker".to_string(),
+            enable_kernel_isolation,
+        }
+    }
+
+    pub fn with_isolation(enable: bool) -> Self {
+        Self {
+            firecracker_path: "firecracker".to_string(),
+            enable_kernel_isolation: enable,
         }
     }
 
@@ -44,6 +62,25 @@ impl SandboxManager {
         // or piping it through a vsock.
 
         Ok(format!("Analysis result for: '{}'", prompt))
+    }
+
+    pub fn execute_with_isolation(
+        &self,
+        mut command: Command,
+        policy: IsolationPolicy,
+    ) -> Result<std::process::Output> {
+        if !self.enable_kernel_isolation {
+            // Fall back to direct execution if isolation is disabled
+            return command
+                .output()
+                .context("Failed to execute command without isolation");
+        }
+
+        let mut executor = SandboxExecutor::new(command, policy)
+            .context("Failed to create SandboxExecutor")?;
+
+        executor.execute()
+            .context("Failed to execute sandboxed command")
     }
 
     pub fn teardown(&self, vm_id: &str) -> Result<()> {
