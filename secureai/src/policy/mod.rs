@@ -5,6 +5,7 @@ use anyhow::{Result, Context};
 pub mod store;
 
 pub use store::{PolicyStore, PolicyStoreUpdate};
+use crate::guardrails::ThreatThresholds;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct PolicyConfig {
@@ -15,6 +16,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub isolation: Option<IsolationPolicy>,
+
+    #[serde(default)]
+    pub guardrails: Option<GuardrailConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -44,12 +48,53 @@ pub struct IsolationPolicy {
     pub max_processes: u32,
 }
 
+#[derive(Debug, Deserialize, Clone)]
+pub struct GuardrailConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_prompt_injection_threshold")]
+    pub prompt_injection_threshold: f32,
+
+    #[serde(default = "default_data_exfiltration_threshold")]
+    pub data_exfiltration_threshold: f32,
+
+    #[serde(default = "default_privilege_escalation_threshold")]
+    pub privilege_escalation_threshold: f32,
+
+    #[serde(default = "default_reverse_shell_threshold")]
+    pub reverse_shell_threshold: f32,
+
+    #[serde(default = "default_sql_injection_threshold")]
+    pub sql_injection_threshold: f32,
+
+    #[serde(default)]
+    pub onnx_model_path: Option<String>,
+}
+
+impl GuardrailConfig {
+    pub fn to_threat_thresholds(&self) -> ThreatThresholds {
+        ThreatThresholds {
+            prompt_injection_threshold: self.prompt_injection_threshold,
+            data_exfiltration_threshold: self.data_exfiltration_threshold,
+            privilege_escalation_threshold: self.privilege_escalation_threshold,
+            reverse_shell_threshold: self.reverse_shell_threshold,
+            sql_injection_threshold: self.sql_injection_threshold,
+        }
+    }
+}
+
 fn default_enable_landlock() -> bool { true }
 fn default_enable_seccomp() -> bool { true }
 fn default_enable_cgroups() -> bool { true }
 fn default_memory_limit() -> u32 { 512 }
 fn default_cpu_quota() -> f64 { 1.0 }
 fn default_process_limit() -> u32 { 100 }
+fn default_prompt_injection_threshold() -> f32 { 0.82 }
+fn default_data_exfiltration_threshold() -> f32 { 0.85 }
+fn default_privilege_escalation_threshold() -> f32 { 0.80 }
+fn default_reverse_shell_threshold() -> f32 { 0.83 }
+fn default_sql_injection_threshold() -> f32 { 0.81 }
 
 impl IsolationPolicy {
     pub fn enabled(&self) -> bool {
