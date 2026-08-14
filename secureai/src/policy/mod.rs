@@ -105,6 +105,7 @@ impl IsolationPolicy {
 pub struct PolicyEngine {
     config: PolicyConfig,
     store: Option<PolicyStore>,
+    guardrail: Option<crate::guardrails::SemanticGuardrail>,
 }
 
 impl PolicyEngine {
@@ -113,14 +114,57 @@ impl PolicyEngine {
             .context(format!("Failed to read policy file at {}", path))?;
         let config: PolicyConfig = toml::from_str(&content)
             .context("Failed to parse policy TOML")?;
-        Ok(Self { config, store: None })
+
+        // Initialize guardrail if configured
+        let guardrail = if let Some(gr_config) = &config.guardrails {
+            if gr_config.enabled {
+                let thresholds = gr_config.to_threat_thresholds();
+                match crate::guardrails::SemanticGuardrail::new(thresholds) {
+                    Ok(gr) => Some(gr),
+                    Err(e) => {
+                        tracing::warn!("Failed to initialize semantic guardrail: {}", e);
+                        None
+                    }
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        Ok(Self {
+            config,
+            store: None,
+            guardrail,
+        })
     }
 
     pub fn with_store(store: PolicyStore) -> Self {
         let config = store.get_policy().as_ref().clone();
+
+        // Initialize guardrail if configured
+        let guardrail = if let Some(gr_config) = &config.guardrails {
+            if gr_config.enabled {
+                let thresholds = gr_config.to_threat_thresholds();
+                match crate::guardrails::SemanticGuardrail::new(thresholds) {
+                    Ok(gr) => Some(gr),
+                    Err(e) => {
+                        tracing::warn!("Failed to initialize semantic guardrail: {}", e);
+                        None
+                    }
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         Self {
             config,
             store: Some(store),
+            guardrail,
         }
     }
 
@@ -174,5 +218,21 @@ impl PolicyEngine {
         &self,
     ) -> Option<tokio::sync::broadcast::Receiver<PolicyStoreUpdate>> {
         self.store.as_ref().map(|store| store.subscribe_updates())
+    }
+
+    pub fn get_guardrail(&self) -> Option<&crate::guardrails::SemanticGuardrail> {
+        self.guardrail.as_ref()
+    }
+
+    pub async fn check_semantic_guardrails(&self, prompt: &str) -> Result<()> {
+        if let Some(guardrail) = &self.guardrail {
+            match guardrail.check_prompt(prompt).await? {
+                crate::guardrails::GuardrailDecision::Deny { reason, .. } => {
+                    return Err(anyhow::anyhow!("Semantic guardrail violation: {}", reason));
+                }
+                crate::guardrails::GuardrailDecision::Permit => {}
+            }
+        }
+        Ok(())
     }
 }
