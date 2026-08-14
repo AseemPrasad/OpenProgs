@@ -8,6 +8,7 @@ mod router;
 mod audit;
 mod telemetry;
 mod queue;
+mod cache;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
