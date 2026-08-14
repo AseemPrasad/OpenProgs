@@ -7,8 +7,8 @@ pub mod hooks;
 pub use job::{Job, JobState, Artifact, Lease, JobError};
 pub use producer::NatsProducer;
 pub use consumer::{NatsConsumer, Worker};
-pub use pool::WorkerPool;
-pub use hooks::{QueueService, QueueHooks, initialize_queue, shutdown_queue, get_queue};
+pub use pool::{WorkerPool, PoolStats};
+pub use hooks::{QueueService, QueueStats, QueueHooks, initialize_queue, shutdown_queue, get_queue, is_queue_enabled};
 
 use serde::Deserialize;
 use std::path::PathBuf;
