@@ -10,6 +10,7 @@ mod telemetry;
 mod queue;
 mod cache;
 mod evals;
+mod auth;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
@@ -129,6 +130,17 @@ async fn main() -> Result<()> {
                 }
             }
 
+            // 1f. Initialize OAuth2/OIDC Auth (if configured)
+            if let Some(auth_cfg) = engine.get_auth_config() {
+                if auth_cfg.enabled {
+                    let validator = crate::auth::JwtValidator::new(auth_cfg.clone())
+                        .await
+                        .context("Failed to initialize JWT validator")?;
+                    crate::auth::initialize_auth(std::sync::Arc::new(validator))?;
+                    info!("✅ OAuth2/OIDC authentication initialized");
+                }
+            }
+
             // 2. Validate Task
             let is_valid = engine.validate_task(&model, input.as_ref());
             crate::audit::GlobalAuditHooks::log_policy_validation("system", &model, is_valid);
@@ -189,6 +201,9 @@ async fn main() -> Result<()> {
 
             // 10. Shutdown Evals
             let _ = crate::evals::shutdown_evals().await;
+
+            // 11. Shutdown Auth
+            let _ = crate::auth::shutdown_auth().await;
         }
         Commands::Logs => {
             println!("📜 Audit Logs (Last 5 sessions):");
