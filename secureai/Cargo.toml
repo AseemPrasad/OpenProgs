@@ -50,3 +50,9 @@ tonic-build = { version = "0.11", optional = true }
 arc-swap = "1.6"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["trace"] }
+
+# Semantic Guardrails
+ort = "2.0"
+ndarray = "0.15"
+ndarray-linalg = { version = "0.16", features = ["openblas-static"] }
+lazy_static = "1.4"
