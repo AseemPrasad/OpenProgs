@@ -3,6 +3,7 @@ mod identity;
 mod sandbox;
 mod api;
 mod guardrails;
+mod proxy;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
