@@ -82,3 +82,8 @@ opentelemetry-otlp = "0.13"
 opentelemetry-proto = "0.20"
 tracing-opentelemetry = "0.21"
 tokio-util = "0.7"
+
+# Distributed Task Queue
+async-nats = "0.34"
+tokio-retry = "0.3"
+thiserror = "1.0"
