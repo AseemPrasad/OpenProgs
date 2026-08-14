@@ -3,6 +3,9 @@ name = "secureai"
 version = "0.1.0"
 edition = "2021"
 
+[build-dependencies]
+tonic-build = "0.11"
+
 [dependencies]
 # Core CLI and Async
 clap = { version = "4.4", features = ["derive"] }
@@ -35,3 +38,12 @@ landlock = "0.3"
 caps = "0.5"
 nix = { version = "0.27", features = ["process"] }
 seccompiler = "0.3"
+
+# gRPC Control Plane
+tonic = "0.11"
+prost = "0.12"
+prost-types = "0.12"
+tonic-build = { version = "0.11", optional = true }
+arc-swap = "1.6"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace"] }
