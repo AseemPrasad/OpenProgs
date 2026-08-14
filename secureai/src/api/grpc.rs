@@ -10,6 +10,8 @@ use policy_service_server::PolicyServiceServer;
 
 use crate::policy::PolicyConfig;
 use crate::api::evals_integration::EvalsIntegration;
+use crate::api::auth_middleware::AuthMiddleware;
+use crate::auth::Permission;
 
 pub struct PolicyServiceImpl {
     policy_store: Arc<RwLock<PolicyConfig>>,
@@ -37,6 +39,37 @@ impl PolicyService for PolicyServiceImpl {
                     reason: format!("Semantic guardrail triggered: {}", e),
                     metadata: std::collections::HashMap::new(),
                 }));
+            }
+        }
+
+        // Optional: Check OAuth2/OIDC authentication if enabled
+        if crate::auth::is_auth_enabled() {
+            match AuthMiddleware::authenticate_request(&request).await {
+                Ok(auth_context) => {
+                    // Check if user has permission to execute tools
+                    if let Err(status) = AuthMiddleware::check_permission(&auth_context, Permission::ToolsExecute) {
+                        let mut err_metadata = std::collections::HashMap::new();
+                        err_metadata.insert("user_id".to_string(), auth_context.user_id);
+                        return Ok(Response::new(EvaluatePolicyResponse {
+                            decision: EvaluatePolicyResponse::Decision::Denied as i32,
+                            rule_id: "auth-permission-denied".to_string(),
+                            reason: status.message().to_string(),
+                            metadata: err_metadata,
+                        }));
+                    }
+                    // Store auth context in extensions for downstream handlers
+                    // Note: This is for future use, not currently propagated in gRPC
+                    tracing::debug!("Request authenticated: user={}, tenant={}",
+                                    auth_context.user_id, auth_context.tenant_id);
+                }
+                Err(status) => {
+                    return Ok(Response::new(EvaluatePolicyResponse {
+                        decision: EvaluatePolicyResponse::Decision::Denied as i32,
+                        rule_id: "auth-failed".to_string(),
+                        reason: status.message().to_string(),
+                        metadata: std::collections::HashMap::new(),
+                    }));
+                }
             }
         }
 
