@@ -3,6 +3,7 @@ pub mod producer;
 pub mod consumer;
 pub mod pool;
 pub mod hooks;
+pub mod integration;
 
 pub use job::{Job, JobState, Artifact, Lease, JobError};
 pub use producer::NatsProducer;

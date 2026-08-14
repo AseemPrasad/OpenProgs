@@ -137,6 +137,15 @@ async fn main() -> Result<()> {
                 duration_ms,
             );
 
+            // Optional: Enqueue long-running tools to queue instead
+            // Example: For tools like web_search, code_exec, document transforms
+            // if let Some(job_id) = crate::queue::integration::QueueIntegration::enqueue_web_search(
+            //     "example query",
+            //     "tenant_123"
+            // ).await? {
+            //     println!("Job enqueued: {}", job_id);
+            // }
+
             println!("\n--- Result ---");
             println!("{}", result);
             println!("--------------\n");
