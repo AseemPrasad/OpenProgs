@@ -1,0 +1,211 @@
+================================================================================
+  SECUREAI MVP - COMPREHENSIVE LEARNING CURRICULUM
+================================================================================
+
+You are viewing a reverse-engineered, structured learning guide to the SecureAI
+MVP codebase. This teaches software architecture, design patterns, and
+engineering principles through detailed code analysis.
+
+================================================================================
+  WHAT'S HERE
+================================================================================
+
+✅ COMPLETED & READY TO READ:
+
+  1. 00_EXECUTIVE_SUMMARY.md (301 lines)
+     - What SecureAI does
+     - Key statistics & principles
+     - Learning outcomes by level
+
+  2. 01_REPOSITORY_MAP.md (675 lines)
+     - Complete filesystem structure
+     - 12 core modules explained
+     - Dependencies & responsibilities
+     - Test organization
+
+  3. README.md (383 lines)
+     - Complete curriculum overview
+     - Learning paths by role
+     - Module descriptions
+     - Quick navigation
+
+  4. TABLE_OF_CONTENTS.md (550 lines)
+     - Detailed breakdown of all 20 modules
+     - What each module covers
+     - Time estimates
+     - Cross-references
+
+  5. GETTING_STARTED.md (468 lines)
+     - Quick-start guides by role
+     - Study tips & techniques
+     - Learning checklist
+     - Time estimates
+
+📋 PLANNED (20 MODULES TOTAL):
+
+  Foundations (Modules 2-3):
+    - Module 02: System Mental Model
+    - Module 03: Architecture Overview
+
+  Deep Dives (Modules 4-7):
+    - Module 04: Component Architecture (all 12 modules)
+    - Module 05: Data Architecture
+    - Module 06: Runtime Flows
+    - Module 07: Important Features
+
+  Engineering Principles (Modules 8-10):
+    - Module 08: Design Patterns
+    - Module 09: Architecture Decisions
+    - Module 10: Alternatives & Tradeoffs
+
+  Quality Attributes (Modules 11-15):
+    - Module 11: Security
+    - Module 12: Reliability
+    - Module 13: Performance
+    - Module 14: Testing
+    - Module 15: Infrastructure
+
+  Application & Reflection (Modules 16-19):
+    - Module 16: Weaknesses & Technical Debt
+    - Module 17: Learning Curriculum (with exercises)
+    - Module 18: Knowledge Gaps
+    - Module 19: Recommended Deep-Dive Order
+
+================================================================================
+  HOW TO GET STARTED
+================================================================================
+
+OPTION 1: Choose Your Role (Recommended)
+  → Open GETTING_STARTED.md
+  → Find your role (Backend, Security, DevOps, Architect)
+  → Follow the suggested reading path
+
+OPTION 2: Complete Learning Path
+  → Start with 00_EXECUTIVE_SUMMARY.md
+  → Read 01_REPOSITORY_MAP.md
+  → Follow learning path in README.md
+
+OPTION 3: Quick 30-Minute Overview
+  → Read 00_EXECUTIVE_SUMMARY.md (20 min)
+  → Skim 01_REPOSITORY_MAP.md (10 min)
+  → You'll understand the system
+
+OPTION 4: Reference Specific Topics
+  → See TABLE_OF_CONTENTS.md for all topics
+  → Jump to relevant modules (once available)
+
+================================================================================
+  QUICK FACTS
+================================================================================
+
+What you'll learn:
+  • Complete architecture of 3,000+ lines of Rust
+  • 10 major features (each independently optional)
+  • 12 core modules and how they interact
+  • 20+ architecture decisions and their rationale
+  • Security, performance, reliability principles
+  • How to extend and modify the system
+
+Time commitment:
+  • Quick start: 30 minutes
+  • Basic understanding: 10-15 hours
+  • Productive contributor: 15-20 hours
+  • Deep mastery: 40-50 hours
+
+Your role:
+  • Backend Engineer: 15 hours (full curriculum focus)
+  • Security Engineer: 12 hours (security focus)
+  • DevOps/SRE: 10 hours (operations focus)
+  • Architect: 18 hours (design focus)
+  • Newcomer: 5-10 hours (productive quickly)
+
+Key statistics:
+  • 10 features
+  • 12 core modules
+  • 150+ unit tests
+  • 30+ dependencies (curated)
+  • 50+ configuration options
+  • 100+ code references
+
+================================================================================
+  FILE GUIDE
+================================================================================
+
+START HERE (Choose one):
+
+  For quick orientation:
+    → README.md (full curriculum overview)
+
+  For role-specific path:
+    → GETTING_STARTED.md (choose your path)
+
+  For complete breakdown:
+    → TABLE_OF_CONTENTS.md (all 20 modules described)
+
+FOUNDATIONS (Read First):
+
+  0. 00_EXECUTIVE_SUMMARY.md
+     ├─ What SecureAI does
+     ├─ Key principles
+     ├─ Architecture layers
+     └─ Who should read what
+
+  1. 01_REPOSITORY_MAP.md
+     ├─ File structure
+     ├─ 12 core modules
+     ├─ Dependencies
+     └─ Test organization
+
+================================================================================
+  LEARNING RECOMMENDATIONS
+================================================================================
+
+If you have 30 minutes:
+  Read: Executive Summary + skim Repository Map
+  Result: Understand what SecureAI does
+
+If you have 5 hours:
+  Read: Executive Summary → Repository Map → System Mental Model
+  Result: Understand the system completely
+
+If you have 15 hours:
+  Read: All current modules + planned foundations + your role's modules
+  Result: Be productive with the codebase
+
+If you have 40+ hours:
+  Read: Entire curriculum + do all exercises
+  Result: Master the system, teach others
+
+================================================================================
+  KEY PRINCIPLES
+================================================================================
+
+This curriculum teaches:
+  1. Security-First Design
+  2. Non-Breaking Evolution
+  3. Layered Defense
+  4. Async/Await Mastery
+  5. Error Handling
+  6. Testing Discipline
+  7. Observable Systems
+  8. Scalability Under Constraints
+  9. Design Patterns
+  10. Architecture Decisions
+
+================================================================================
+  NEXT STEPS
+================================================================================
+
+1. Choose your learning approach (quick/deep/role-specific)
+2. Open the recommended starting document
+3. Work through modules sequentially
+4. Answer questions at end of sections
+5. Look up code references in actual repository
+6. Do practical exercises
+7. Teach what you've learned to someone else
+
+================================================================================
+
+Ready to learn? → Open: README.md or GETTING_STARTED.md
+
+================================================================================
