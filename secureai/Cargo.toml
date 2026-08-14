@@ -65,3 +65,8 @@ tiktoken-rs = "0.5"
 bytes = "1.5"
 parking_lot = "0.12"
 futures-util = "0.3"
+
+# Multi-Model Router
+reqwest = { version = "0.11", features = ["json"] }
+num_cpus = "1.16"
+atomic_float = "1.1"
