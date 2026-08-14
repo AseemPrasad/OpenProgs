@@ -2,7 +2,11 @@ use serde::Deserialize;
 use std::path::PathBuf;
 use anyhow::{Result, Context};
 
-#[derive(Debug, Deserialize)]
+pub mod store;
+
+pub use store::{PolicyStore, PolicyStoreUpdate};
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct PolicyConfig {
     pub allowed_paths: Vec<PathBuf>,
     pub network_access: bool,
@@ -55,6 +59,7 @@ impl IsolationPolicy {
 
 pub struct PolicyEngine {
     config: PolicyConfig,
+    store: Option<PolicyStore>,
 }
 
 impl PolicyEngine {
@@ -63,7 +68,15 @@ impl PolicyEngine {
             .context(format!("Failed to read policy file at {}", path))?;
         let config: PolicyConfig = toml::from_str(&content)
             .context("Failed to parse policy TOML")?;
-        Ok(Self { config })
+        Ok(Self { config, store: None })
+    }
+
+    pub fn with_store(store: PolicyStore) -> Self {
+        let config = store.get_policy().as_ref().clone();
+        Self {
+            config,
+            store: Some(store),
+        }
     }
 
     pub fn validate_task(&self, model: &str, input_path: Option<&PathBuf>) -> bool {
@@ -91,5 +104,9 @@ impl PolicyEngine {
 
     pub fn get_isolation_policy(&self) -> Option<&IsolationPolicy> {
         self.config.isolation.as_ref()
+    }
+
+    pub fn get_store(&self) -> Option<&PolicyStore> {
+        self.store.as_ref()
     }
 }
