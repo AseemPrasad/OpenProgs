@@ -37,6 +37,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub cache: Option<crate::cache::CacheConfig>,
+
+    #[serde(default)]
+    pub evals: Option<crate::evals::EvalsConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -268,5 +271,9 @@ impl PolicyEngine {
 
     pub fn get_cache_config(&self) -> Option<&crate::cache::CacheConfig> {
         self.config.cache.as_ref()
+    }
+
+    pub fn get_evals_config(&self) -> Option<&crate::evals::EvalsConfig> {
+        self.config.evals.as_ref()
     }
 }
