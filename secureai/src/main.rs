@@ -7,6 +7,7 @@ mod proxy;
 mod router;
 mod audit;
 mod telemetry;
+mod queue;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
