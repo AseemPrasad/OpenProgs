@@ -22,6 +22,9 @@ pub struct PolicyConfig {
 
     #[serde(default)]
     pub proxy: Option<crate::proxy::ProxyConfig>,
+
+    #[serde(default)]
+    pub router: Option<crate::router::RouterConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
