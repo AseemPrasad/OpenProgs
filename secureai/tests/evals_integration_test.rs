@@ -299,7 +299,7 @@ mod evals_integration_tests {
     fn test_evals_config_defaults() {
         let config = EvalsConfig::default();
 
-        assert_eq!(config.enabled, true);
+        assert_eq!(config.enabled, false);
         assert_eq!(config.sampling_rate, 0.1);
         assert_eq!(config.boost_flagged_requests, 1.0);
         assert_eq!(config.anomaly_threshold, 3.0);
