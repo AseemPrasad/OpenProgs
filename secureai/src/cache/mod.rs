@@ -4,6 +4,8 @@ pub mod tier2;
 pub mod manager;
 pub mod integration;
 
+pub use integration::CacheIntegration;
+
 pub use entry::{CacheEntry, CacheMetadata, CacheTier, CacheHit};
 pub use tier1::ExactMatchCache;
 pub use tier2::SemanticCache;
