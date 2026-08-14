@@ -2,6 +2,7 @@ pub mod exporter;
 pub mod spans;
 
 pub use exporter::{OTLPExporter, OTLPConfig};
+pub use spans::{SpanInstrumentation, ScopedSpan};
 
 use serde::Deserialize;
 
