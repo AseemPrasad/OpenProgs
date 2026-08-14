@@ -1,10 +1,12 @@
 pub mod keys;
 pub mod ledger;
 pub mod persist;
+pub mod hooks;
 
 pub use keys::{Ed25519KeyManager, KeyConfig};
 pub use ledger::{AuditLedger, AuditEntry};
 pub use persist::AuditPersist;
+pub use hooks::{AuditHooks, GlobalAuditHooks, AuditLedgerRef};
 
 use serde::Deserialize;
 use std::path::PathBuf;

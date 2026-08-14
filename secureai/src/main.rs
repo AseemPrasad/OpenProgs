@@ -68,13 +68,19 @@ async fn main() -> Result<()> {
                         crate::audit::Ed25519KeyManager::load_or_generate(&audit_cfg.key_path)
                             .context("Failed to initialize audit keys")?
                     );
-                    let _ledger = if audit_cfg.persistence_enabled {
+                    let ledger = if audit_cfg.persistence_enabled {
                         crate::audit::AuditLedger::new(key_mgr, Some(audit_cfg.ledger_path.clone()))?
                     } else {
                         crate::audit::AuditLedger::new(key_mgr, None)?
                     };
+                    let ledger_ref = std::sync::Arc::new(parking_lot::RwLock::new(ledger));
+                    crate::audit::GlobalAuditHooks::initialize(Some(ledger_ref));
                     info!("✅ Audit ledger initialized");
+                } else {
+                    crate::audit::GlobalAuditHooks::initialize(None);
                 }
+            } else {
+                crate::audit::GlobalAuditHooks::initialize(None);
             }
 
             // 1b. Initialize OpenTelemetry OTLP (if configured)
@@ -88,7 +94,10 @@ async fn main() -> Result<()> {
             }
 
             // 2. Validate Task
-            if !engine.validate_task(&model, input.as_ref()) {
+            let is_valid = engine.validate_task(&model, input.as_ref());
+            crate::audit::GlobalAuditHooks::log_policy_validation("system", &model, is_valid);
+
+            if !is_valid {
                 error!("❌ Security policy violation! Task rejected.");
                 return Ok(());
             }
@@ -104,8 +113,18 @@ async fn main() -> Result<()> {
 
             // 5. Execute Task
             println!("🤖 Agent Processing: \"{}\"", prompt);
+            let start_time = std::time::Instant::now();
             let result = sandbox.execute_task(&vm_id, &prompt)?;
-            
+            let duration_ms = start_time.elapsed().as_millis() as u64;
+
+            // Log sandbox execution to audit trail
+            crate::audit::GlobalAuditHooks::log_sandbox_execution(
+                "system",
+                &vm_id,
+                "success",
+                duration_ms,
+            );
+
             println!("\n--- Result ---");
             println!("{}", result);
             println!("--------------\n");
