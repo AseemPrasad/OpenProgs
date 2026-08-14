@@ -87,3 +87,7 @@ tokio-util = "0.7"
 async-nats = "0.34"
 tokio-retry = "0.3"
 thiserror = "1.0"
+
+# Semantic Caching
+moka = { version = "0.12", features = ["future"] }
+distances = "0.2"
