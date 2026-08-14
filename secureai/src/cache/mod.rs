@@ -4,6 +4,9 @@ pub mod tier2;
 pub mod manager;
 pub mod integration;
 
+#[allow(dead_code)]
+pub mod examples;
+
 pub use integration::CacheIntegration;
 
 pub use entry::{CacheEntry, CacheMetadata, CacheTier, CacheHit};
