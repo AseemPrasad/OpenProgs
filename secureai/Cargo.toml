@@ -66,6 +66,10 @@ bytes = "1.5"
 parking_lot = "0.12"
 futures-util = "0.3"
 
+# Real-Time Online Evaluation & Drift Detection
+statrs = "0.16"
+quantiles = "0.7"
+
 # Multi-Model Router
 reqwest = { version = "0.11", features = ["json"] }
 num_cpus = "1.16"
