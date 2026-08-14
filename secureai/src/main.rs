@@ -4,6 +4,7 @@ mod sandbox;
 mod api;
 mod guardrails;
 mod proxy;
+mod router;
 
 use clap::{Parser, Subcommand};
 use anyhow::{Result, Context};
